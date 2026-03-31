@@ -5,12 +5,76 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+classDiagram
+    class PawPalApp {
+        - planner: Planner
+        + create_task(name, duration, priority)
+        + read_tasks() : List~Task~
+        + update_task(task_id, new_data)
+        + delete_task(task_id)
+        + render_ui()
+    }
+
+    class Owner {
+        - name: String
+        - time_available_mins: int
+        - preferences: List~String~
+        + update_availability(mins: int)
+        + get_available_time() : int
+    }
+
+    class Pet {
+        - name: String
+        - species: String
+        - hunger_level: int  %% 0-100 scale
+        - energy_level: int  %% 0-100 scale
+        - hygiene_level: int %% 0-100 scale
+        - needs_meds: bool
+        + feed(food_amount: int)
+        + provide_enrichment(duration: int)
+        + groom()
+        + simulate_time_passing(hours: int)
+    }
+
+    class Task {
+        - id: int
+        - name: String
+        - duration_mins: int
+        - priority: int
+        - category: String   %% e.g., "Food", "Exercise", "Grooming"
+        - is_completed: bool
+        + mark_completed()
+    }
+
+    class Planner {
+        - task_pool: List~Task~
+        - owner: Owner
+        - pet: Pet
+        + add_to_pool(task: Task)
+        - calculate_dynamic_priority(task: Task) : int
+        + generate_daily_plan() : List~Task~
+        + generate_reasoning() : String
+    }
+
+    PawPalApp --> Planner : Uses
+    Planner "1" *-- "many" Task : Manages
+    Planner "1" *-- "1" Owner : Considers constraints of
+    Planner "1" *-- "1" Pet : Plans for
+
 - What classes did you include, and what responsibilities did you assign to each?
+Owner: This will hold how much time the user has for their pet.
+Pet: The pet itself it will hold the pets tasks like getting fe
+Task: Keeps information of a single task
+Planner: This is plan the schedule
+PawPalApp/app: The streamlit interface 
 
 **b. Design changes**
 
 - Did your design change during implementation?
+Yes, alot. Their is so much to consider with tracking the pets status.
+
 - If yes, describe at least one change and why you made it.
+Adding internal states for the pet like hunger_level and energy_level. It made sense to add it because if the app only tracked when your feeding it, how would you know how much you fed your pet 1 scoop or 2 scoops. Pets could also get a long walk in or a short one. 
 
 ---
 
