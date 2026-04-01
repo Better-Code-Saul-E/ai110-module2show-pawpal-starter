@@ -103,13 +103,19 @@ A task such as feeding should be the most important. Without food your pet will 
 **a. How you used AI**
 
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
+I used AI to expand my basic UML and it suggested adding internal pet states like hunger_level instead of static variables
+I also used AI to debug when i got a module import error.
 
 - What kinds of prompts or questions were most helpful?
+The context aware prompt #codebase to ask for algorithms based on the existing code have me better results that asking questions about the algorithms.
 
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
+When using #codebase copilot gave me many suggestions and i did not accept all of them. Some of the code was too complex for me to understand, so i rejected it.
+
 - How did you evaluate or verify what the AI suggested?
+I evaluated the suggestions against the projects rubric. Implementing everything would over complicate the app.
 
 ---
 
@@ -118,12 +124,26 @@ A task such as feeding should be the most important. Without food your pet will 
 **a. What you tested**
 
 - What behaviors did you test?
+Testing if creating a task adds it to the database
+
+Verify the planner is sorting by value per minute instead of the priority
+
+Verify the app is resetting back to pending when recurring  and leaving the single time tasks as complete
+
+Verifying that the planner rejects tasks the exceed the owners remaning freetime
+
 - Why were these tests important?
+The tests are important since they are the ones that check the core features of the application.
+
 
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
+I am confident. I see their are tests and i have also manually tested some parts of the app.
+
 - What edge cases would you test next if you had more time?
+A tie breaking test, if the user has 2 tasks with the same value per minute score
+Also if the user deletes a task that recurs, how would we know that it wont pop up the next day
 
 ---
 
