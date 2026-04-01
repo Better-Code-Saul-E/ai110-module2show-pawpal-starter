@@ -152,11 +152,15 @@ Also if the user deletes a task that recurs, how would we know that it wont pop 
 **a. What went well**
 
 - What part of this project are you most satisfied with?
+I am satisfied with the UML, ive always had trouble planning a UML, but AI seems to make that easier.
 
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
+I would add a lightweight database, for cases when the streamlit session accidentally restarts.
 
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+
+I learned how to work with AI as a collaborator. The codebase commmand is amazing. Even though AI is great i still have to add as the lead or it will get caught up with irrelevant fixes.
