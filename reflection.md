@@ -83,12 +83,18 @@ Adding internal states for the pet like hunger_level and energy_level. It made s
 **a. Constraints and priorities**
 
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
+Time limits like the owners availible time vs the time it takes to complete a task
+The time of day to make sure that a task isnt scheduled for morning when listed for the evening 
 - How did you decide which constraints mattered most?
+The owners time is the most important, since it is the owner how is making the schedule. If they dont have time then it wont be scheduled.
 
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+The is that my scheduler is sorted by value per minute. It grabs the highest rank that fits in the remaning time and schedules it. It will no look ahead to see if a combination of three smaller taks could fill a 30 minute block better than a 25 minute task.
+
 - Why is that tradeoff reasonable for this scenario?
+A task such as feeding should be the most important. Without food your pet will obviously die.
 
 ---
 
@@ -97,6 +103,7 @@ Adding internal states for the pet like hunger_level and energy_level. It made s
 **a. How you used AI**
 
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
+
 - What kinds of prompts or questions were most helpful?
 
 **b. Judgment and verification**

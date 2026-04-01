@@ -9,6 +9,8 @@ class Task:
     priority: int
     category: str
     is_completed: bool = False
+    is_recurring: bool = False        
+    time_of_day: str = "Any"          
 
     def mark_completed(self) -> None:
         """Marks the task as completed by setting is_completed to True."""
@@ -19,9 +21,9 @@ class Task:
 class Pet:
     name: str
     species: str
-    hunger_level: int = 50   # 0-100 scale (100 is starving)
-    energy_level: int = 50   # 0-100 scale (100 means hyper/needs exercise)
-    hygiene_level: int = 50  # 0-100 scale (100 means filthy)
+    hunger_level: int = 50   
+    energy_level: int = 50   
+    hygiene_level: int = 50  
     needs_meds: bool = False
 
     def feed(self, food_amount: int) -> None:
@@ -79,21 +81,31 @@ class Planner:
         if task.category.lower() == "food" and self.pet.hunger_level > 75:
             dynamic_priority += 50
             
-        if task.category.lower() in ["exercise", "enrichment"] and self.pet.energy_level > 80:
-            dynamic_priority += 30
+        if task.category.lower() in ["exercise", "enrichment"]:
+            if self.pet.energy_level > 80:
+                dynamic_priority += 30
+            elif self.pet.energy_level < 30:
+                dynamic_priority -= 20
 
         if task.category.lower() == "grooming" and self.pet.hygiene_level > 90:
             dynamic_priority += 20
 
         return dynamic_priority
 
-    def generate_daily_plan(self) -> List[Task]:
+    def generate_daily_plan(self, current_time_of_day: str = "Any") -> List[Task]:
         """Generates a daily schedule prioritizing urgent pet needs within available time."""
-        pending_tasks = [t for t in self.task_pool if not t.is_completed]
         
+        pending_tasks = []
+        
+        for t in self.task_pool:
+            if not t.is_completed:
+                if t.time_of_day == "Any" or current_time_of_day == "Any" or t.time_of_day == current_time_of_day:
+                    pending_tasks.append(t)
+        
+        # UPGRADE: Sorting by value-per-minute
         sorted_tasks = sorted(
             pending_tasks, 
-            key=lambda t: self._calculate_dynamic_priority(t), 
+            key=lambda t: self._calculate_dynamic_priority(t) / max(1, t.duration_mins), 
             reverse=True
         )
 
@@ -102,6 +114,8 @@ class Planner:
         tasks_scheduled_count = 0
 
         for task in sorted_tasks:
+            # UPGRADE: Time Conflict Detection
+            # If a task takes longer than the time we have left, skip it!
             if task.duration_mins <= time_left:
                 schedule.append(task)
                 time_left -= task.duration_mins
@@ -109,8 +123,8 @@ class Planner:
 
         time_used = self.owner.get_available_time() - time_left
         self._last_reasoning = (
-            f"Scheduled {tasks_scheduled_count} tasks taking {time_used} mins. "
-            f"Prioritized based on {self.pet.name}'s current needs "
+            f"Scheduled {tasks_scheduled_count} {current_time_of_day} tasks taking {time_used} mins. "
+            f"Prioritized by value-per-minute based on {self.pet.name}'s current needs "
             f"(Hunger: {self.pet.hunger_level}, Energy: {self.pet.energy_level})."
         )
 
@@ -127,19 +141,30 @@ class PawPalApp:
         self.tasks_db: Dict[int, Task] = {} 
         self._next_id: int = 1
 
-    def create_task(self, name: str, duration: int, priority: int, category: str) -> Task:
+    def create_task(self, name: str, duration: int, priority: int, category: str, is_recurring: bool = False, time_of_day: str = "Any") -> Task:
         """Creates a new task, saves it to the database, and adds it to the planner."""
+        safe_duration = max(1, duration)
+        safe_priority = max(1, min(10, priority))
+        
         new_task = Task(
             id=self._next_id,
             name=name,
-            duration_mins=duration,
-            priority=priority,
-            category=category
+            duration_mins=safe_duration,
+            priority=safe_priority,
+            category=category,
+            is_recurring=is_recurring,
+            time_of_day=time_of_day
         )
         self.tasks_db[self._next_id] = new_task
         self.planner.add_to_pool(new_task)
         self._next_id += 1
         return new_task
+
+    def start_new_day(self) -> None:
+        """NEW: Handles recurring tasks by resetting them for the next day."""
+        for task in self.tasks_db.values():
+            if task.is_recurring:
+                task.is_completed = False
 
     def read_tasks(self) -> List[Task]:
         """Returns a list of all tasks currently in the database."""
